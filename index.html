@@ -889,9 +889,6 @@
     </footer>
 
     <script>
-      // ─── Your Anthropic API key — replace before deploying ───
-      const API_KEY = "";
-      // ─────────────────────────────────────────────────────────
 
       /* ── Wave background ── */
       (function () {
@@ -1110,42 +1107,23 @@
       }
 
       async function generate(jobTitle) {
-        const prompt = `You are a senior HR professional and expert interviewer. Generate exactly 3 thoughtful, behavioural interview questions for a "${jobTitle}" role.
+        const res = await fetch("/.netlify/functions/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jobTitle }),
+        });
 
-Requirements:
-- Each question should reveal real competency, judgement, or past experience
-- Cover 3 distinct dimensions of the role (e.g. technical skill, collaboration, problem-solving)
-- Questions must feel specific to this role — not generic
-- No explanations, tips, preamble, or labels — ONLY the 3 questions
-- Format: numbered list starting with 1.
-
-Role: ${jobTitle}`;
-
-        const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-            }),
-          },
-        );
+        const data = await res.json();
 
         if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          if (res.status === 400)
-            throw new Error("Invalid API key. Check and try again.");
           if (res.status === 429)
             throw new Error("Rate limit reached. Wait a moment and try again.");
           throw new Error(
-            err?.error?.message ||
-              `Something went wrong (${res.status}). Please try again.`,
+            data?.error || `Something went wrong (${res.status}). Please try again.`,
           );
         }
 
-        const data = await res.json();
-        const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        const raw = data?.text || "";
         if (!raw) throw new Error("No response received. Please try again.");
         return parseQuestions(raw);
       }
