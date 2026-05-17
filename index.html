@@ -890,7 +890,7 @@
 
     <script>
       // ─── Your Anthropic API key — replace before deploying ───
-      const API_KEY = "AIzaSyDTgmCj6S9tl5ElUg_mHK0ZgwGC95jWNRE";
+      const API_KEY = "";
       // ─────────────────────────────────────────────────────────
 
       /* ── Wave background ── */
@@ -1122,7 +1122,7 @@ Requirements:
 Role: ${jobTitle}`;
 
         const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
